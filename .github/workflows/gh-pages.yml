@@ -6,7 +6,7 @@ on:
       - main  # Set a branch name to trigger deployment
 jobs:
   publish:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Cache Maven packages
         uses: actions/cache@v3
