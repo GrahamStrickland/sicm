@@ -15,7 +15,13 @@
     {:git/url "https://github.com/nextjournal/clerk"
      ;; make sure this sha matches the one in `:deps` above.
      :git/sha "a46ea503eb71a63c85006807928a9eea52d7d07a"
-     :deps/root "render"}}
+     :deps/root "render"}
+    ;; Explicit SLF4J binding so Clerk's file watcher stops printing the
+    ;; "Failed to load StaticLoggerBinder / defaulting to NOP" notice.
+    org.slf4j/slf4j-nop {:mvn/version "1.7.36"}}
+   ;; Grant JNA (used by the directory watcher for macOS FSEvents) native
+   ;; access so the JDK doesn't warn about restricted methods.
+   :jvm-opts ["--enable-native-access=ALL-UNNAMED"]
    :exec-fn user/build!}
 
   ;; nREPL server for editor integration (Conjure, CIDER, etc.). Combine with
