@@ -46,5 +46,6 @@ public/js
 .cache/
 public
 
-# VSCode files
 *.code-workspace
+.calva/
+.clj-kondo/
