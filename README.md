@@ -125,6 +125,66 @@ To show a file, pass it to `clerk/show!`:
 > These commands work because dev/user.clj requires `nextjournal.clerk` under a
 > `clerk` alias, and defines a `serve!` function.
 
+### Neovim (Conjure) Workflow
+
+This is the end-to-end loop for developing the notebooks in Neovim with
+[Conjure](https://github.com/Olical/conjure). It assumes you also have a Clojure
+filetype plugin and (optionally) [clojure-lsp](https://clojure-lsp.io/) for
+completion and navigation.
+
+1. **Start the nREPL server** in a terminal at the project root:
+
+   ```sh
+   clojure -M:nextjournal/clerk:nrepl
+   ```
+
+   This activates both the `:nextjournal/clerk` alias (Clerk's render deps) and
+   the `:nrepl` alias, which starts an nREPL server and writes the port to
+   `.nrepl-port`. Leave it running.
+
+2. **Open the notebook** and let Conjure connect via `.nrepl-port`:
+
+   ```sh
+   nvim notebooks/GrahamStrickland/sicm.clj
+   ```
+
+   Connection is automatic when you open a `.clj` file; otherwise run
+   `:ConjureConnect`. Open the Conjure log with `<localleader>lv` to confirm.
+
+3. **Load the whole buffer first** with `<localleader>eb`. This evaluates the
+   `ns` form — which brings Emmy's generic operators (`+`, `sin`, `square`, …)
+   into scope — and defines every function in the file.
+
+   > **Important:** always load the namespace (`<localleader>eb`) before
+   > evaluating individual forms, and again after any REPL restart or edit to
+   > the `ns` form. Evaluating a form like `(square (sin (+ 'a 3)))` before the
+   > namespace is loaded runs it in `user`, where `+` is `clojure.core/+`, and
+   > fails with `Symbol cannot be cast to Number`.
+
+4. **Start the Clerk webserver** by evaluating `(user/serve!)` (for example with
+   `:ConjureEval (user/serve!)`). This serves the notebook at
+   http://localhost:7777 with a file watcher on `notebooks/`.
+
+5. **Iterate.** Evaluate a single form under the cursor with `<localleader>ee`
+   (or the enclosing top-level form with `<localleader>er`); results appear
+   inline and in the Conjure log. Saving the file makes Clerk re-render the
+   page in the browser automatically.
+
+6. **Shut down** by evaluating `(user/halt!)` to stop Clerk, then `Ctrl-D` (or
+   `(exit)`) in the nREPL terminal.
+
+| Step | Command |
+| --- | --- |
+| Start server | `clojure -M:nextjournal/clerk:nrepl` (terminal) |
+| Open notebook | `nvim notebooks/GrahamStrickland/sicm.clj` |
+| Connect | automatic, or `:ConjureConnect` |
+| **Load namespace** | `<localleader>eb` |
+| Start Clerk | eval `(user/serve!)` → http://localhost:7777 |
+| Eval a form | `<localleader>ee` |
+| Re-render | save the file |
+| Lint | `bb lint` |
+| Stop | `(user/halt!)`, then `Ctrl-D` |
+
 ## Custom ClojureScript and JavaScript
 
 All ClojureScript code you add to `src/GrahamStrickland/custom.cljs` is available
