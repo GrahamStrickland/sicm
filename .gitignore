@@ -49,3 +49,4 @@ public
 *.code-workspace
 .calva/
 .clj-kondo/
+.dir-locals.el
